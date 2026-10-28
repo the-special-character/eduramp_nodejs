@@ -21,8 +21,8 @@ enum Role {
 enum OrderStatus {
   PENDING
   PAID
-  SHIPED
-  CANCELED
+  SHIPPED
+  CANCELLED
 }
 
 model User {
