@@ -32,6 +32,7 @@ export async function register(req, res) {
       data: { user, accessToken: accessToken(user) },
     });
   } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw ApiError.conflict(error.message)
   }
 }
@@ -59,10 +60,11 @@ export async function login(req, res) {
 
     res.json({
       success: true,
-      message: "Registered Successfully",
+      message: "Logged in Successfully",
       data: { user: safeUser, accessToken: accessToken(user) },
     });
   } catch (error) {
+    if (error instanceof ApiError) throw error;
     throw ApiError.conflict(error.message)
   }
 }

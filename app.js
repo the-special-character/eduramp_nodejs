@@ -23,4 +23,16 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/products", productRoutes)
 
+// Return errors as JSON (Express' default handler sends HTML)
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  const status = err.statusCode ?? err.status ?? 500;
+  if (status >= 500) console.error(err);
+  res.status(status).json({
+    success: false,
+    message: status >= 500 ? "Internal Server Error" : err.message,
+    ...(err.details && { details: err.details }),
+  });
+});
+
 export default app;
