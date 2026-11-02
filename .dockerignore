@@ -1,0 +1,15 @@
+# Files Docker should NOT send into the build.
+# Smaller context = faster builds, and secrets never end up in an image.
+node_modules
+generated
+.git
+.gitignore
+.env
+.env.*
+*.log
+Dockerfile
+.dockerignore
+README.md
+.claude
+.agents
+.windsurf
