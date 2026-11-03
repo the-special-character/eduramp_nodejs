@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: eduramp
+      POSTGRES_PASSWORD: eduramp
+      POSTGRES_DB: eduramp
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eduramp -d eduramp"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+
+  backend:
+    build: .
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_URL: postgresql://eduramp:eduramp@db:5432/eduramp
+      JWT_SECRET: 5XsYeleONaLpqFuYY+ZEeJKL19QHTFb87z+2JFfsR4A=
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      
+  mock-api:
+    image: node:22-alpine
+    command: npx -y json-server@0.17.4 --host 0.0.0.0 --port 8000 /data/db.json
+    volumes:
+      - ../eduramp-training/db.json:/data/db.json
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ../eduramp-training
+    environment:
+      BETTER_AUTH_SECRET: t4cDWrvWtGfytpdCy22tTB36xBtoIWgQlR2swVOvMi4=
+      BACKEND_API_URL: http://backend:8080/api
+      BETTER_AUTH_URL: http://localhost:3000
+      MOCK_API_URL: http://mock-api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - mock-api
+    
+volumes:
+  db-data:
